@@ -84,3 +84,94 @@ Guest VLAN: A separate network for visitors provides internet access without exp
 IoT VLAN: IoT devices often have weaker security and pose a higher risk of compromise. Placing them on their own isolated VLAN mitigates the threat of lateral movement and prevents potential attacks from reaching the primary network and management devices.
 
 Segmenting in this way enhances overall security by minimizing attack surfaces, improves network stability by limiting broadcast traffic within VLANs, and simplifies monitoring and applying tailored firewall rules for each segment.
+
+---
+
+# Installation
+
+## OpenWRT
+Installing OpenWrt unlocks powerful networking features that consumer-grade firmware typically lacks. Below is a general guide to flashing OpenWrt on routers similar to the Cudy WR3000S.
+
+### Step 1: Verify Router Compatibility
+Confirm your router model and hardware version is supported by OpenWrt.
+Check the OpenWrt Table of Hardware and search for your device to find compatible firmware images and notes.
+
+### Step 2: Download the Correct OpenWrt Firmware
+Visit the OpenWrt Firmware Selector or the OpenWrt download page for your router.
+Download the correct release image for your router model and hardware revision.
+For Cudy WR3000S, ensure you select images built for that specific device.
+
+### Step 3: Prepare for Installation
+Connect your computer to the router via Ethernet to avoid interruptions during the process.
+Set a static IP on your PC aligned with the router’s default management subnet if necessary (e.g., 192.168.1.x).
+
+### Step 4: Flash the Firmware
+Access the router’s current administration interface (usually at http://192.168.1.1).
+Locate the firmware upgrade section.
+Upload the OpenWrt firmware image.
+Confirm and wait patiently for the router to flash and reboot. Interrupting this process can brick the device.
+
+### Step 5: Initial Access and Configuration
+After reboot, connect to the new OpenWrt interface at http://192.168.1.1.
+No password is set initially; set a strong root password immediately.
+Begin configuring network settings including VLANs, Wi-Fi security (WPA3), firewall zones, and packages for remote management.
+
+### Useful Resources
+- OpenWrt Official Installation Guide: https://openwrt.org/docs/guide-quick-start/flashing
+- Cudy WR3000S OpenWrt Community Discussions: https://forum.openwrt.org/t/openwrt-on-cudy-wr3000s/233708
+- OpenWrt Firmware Selector: https://firmware-selector.openwrt.org/
+- OpenWrt Table of Hardware (Compatibility): https://toh.openwrt.org/?view=normal
+
+---
+
+## Proxmox
+Installing Proxmox VE on a dedicated PC turns it into a powerful virtualization platform for managing home automation, network segmentation, and other services. Here’s a step-by-step guide to get you started.
+
+### Step 1: Prepare the Hardware
+- Select a PC with a compatible processor (Intel or AMD), at least 8GB RAM, and SSD storage (NVMe or SATA).
+- Ensure the PC has networking capabilities suitable for your segmentation needs.
+- Optional: Add multiple NICs for network flexibility.
+
+### Step 2: Download Proxmox VE ISO
+- Visit the [Proxmox Download page](https://www.proxmox.com/en/downloads).
+- Download the latest ISO installer image compatible with your hardware.
+
+### Step 3: Create Bootable USB Installer
+- Use a tool like Etcher (Windows/Mac/Linux) to create a bootable USB drive:
+- Resource: [Proxmox USB Boot Guide](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#_usb_installation)
+
+### Step 4: BIOS/UEFI Settings for Boot
+- Insert the USB installer into your PC and power on.
+- Enter BIOS/UEFI settings (usually by pressing Del, F2, or F12 during boot).
+
+Configure the following:
+- Set boot priority to boot from the USB drive first.
+- Disable Secure Boot if enabled.
+- Enable UEFI mode if supported, or leave in Legacy mode based on your hardware.
+- Enable TPM or secure boot only if required, but typically disabled for Proxmox.
+
+Save and Exit.
+
+### Step 5: Enable Automatic Power-On
+- While in BIOS/UEFI, find settings like "Restore on AC Power Loss" or "AC Back".
+- Set it to "Power On" or "Always On" so that the device automatically powers on after power loss.
+
+Note: This setting ensures your Proxmox server will automatically start without manual intervention after power outages or restarts.
+
+### Step 6: Install Proxmox VE
+- Boot from the USB drive.
+- Follow on-screen prompts:
+  - Choose the target disk.
+  - Set the country, timezone, and keyboard layout.
+  - Define the admin password and network settings.
+- Finish installation and remove the USB when prompted.
+- Reboot the PC; it should now boot into Proxmox automatically.
+
+### Step 7: Post-Installation Setup
+- Log in via the web interface at https://<your-ip>:8006.
+- Complete network configuration, storage setup, and VM deployment as needed.
+
+### Resources:
+- [Proxmox VE Official Installation Guide](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#_installation)
+- [Official Etcher Website](https://etcher.balena.io/)
+
