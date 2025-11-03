@@ -47,30 +47,29 @@ The single NIC constraint was overcome by using a USB to Ethernet adapter plugge
 This experience highlights the importance of NIC count for network routing and virtualization projects, and how pragmatic workarounds can adapt budget hardware to professional-grade network topologies.
 
   ### Server selection tips:
-  When choosing hardware to run Proxmox for a secure, segmented home automation environment, keep these points in mind:
-  1. CPU Performance
+  - CPU Performance
      - Select a CPU with multiple cores and good single-thread performance to efficiently run Home Assistant and any lightweight supporting containers or VMs.
      - A modern Intel or AMD processor from recent generations is recommended for energy efficiency and virtualization features (e.g., VT-x/AMD-V).
-  2. Memory (RAM)
+  - Memory (RAM)
      - Home Assistant and additional services require at least 8GB RAM for smooth operation; 16GB offers better headroom for future expansion.
      - More RAM allows for running additional VMs/containers if needed.
-  4. Storage
+  - Storage
      - Use SSD storage for the OS and VM disks to ensure fast boot and responsiveness.
      - Consider NVMe drives if budget permits for even better performance.
      - Sufficient capacity to hold backups, snapshots, and VM images is important (256GB or more recommended).
-  6. Network Interfaces
+  - Network Interfaces
      - Multiple physical NICs are highly beneficial for VLAN bridging and isolating traffic per network segment, especially in segmented setups.
      - At least two NICs are recommended: one for WAN or management, another dedicated to IoT or guest VLANs.
-  5. Expansion Ports and Connectivity
+  - Expansion Ports and Connectivity
      - USB ports can be useful for adding additional NICs (e.g., via USB to Ethernet adapters) if physical NICs are limited.
      - Consider availability of PCIe slots if you plan advanced networking cards in the future.
-  6. Power and Noise
+  - Power and Noise
      - For a home environment, low power consumption and quiet operation are desirable.
      - Mini-PCs with efficient cooling strike a good balance between performance and noise.
-  7. Budget and Future Proofing
+  - Budget and Future Proofing
      - Choose hardware that fits your budget but leaves room for future service expansions or increased automation complexity.
      - Avoid overpaying for unused capabilities but ensure the platform won't bottleneck soon.
-  8. Reliability and Support
+  - Reliability and Support
      - Opt for well-supported hardware with good community or vendor support.
      - Confirm Proxmox compatibility or ensure drivers for network/storage devices are available on Debian-based systems.
 
@@ -175,3 +174,59 @@ Note: This setting ensures your Proxmox server will automatically start without 
 - [Proxmox VE Official Installation Guide](https://pve.proxmox.com/pve-docs/pve-admin-guide.html#_installation)
 - [Official Etcher Website](https://etcher.balena.io/)
 
+---
+
+# Configurations
+
+## OpenWRT bridges, VLANs, & firewall
+
+When placing OpenWrt behind an ISP-provided router (in a double NAT or routed mode), careful network and firewall configuration is essential to maintain segmentation and security.
+
+### Step 1: Connect OpenWrt WAN to ISP Router LAN
+Physically connect one of OpenWrt’s WAN ports to a LAN port on the ISP gateway.
+Configure OpenWrt WAN interface for DHCP to receive an IP from ISP router.
+
+### Step 2: Configure LAN Bridge and Create VLANs
+OpenWrt uses Linux bridges for LAN ports and wireless interfaces:
+Under Network → Interfaces → LAN, create a bridge (br-lan) including all LAN ports and Wi-Fi.
+Define VLANs for segmentation:
+Go to Network → Switch (or Network → VLANs depending on device).
+Create VLAN IDs (e.g., VLAN 10 for management, VLAN 20 guests, VLAN 30 IoT).
+Assign physical ports and SSIDs to VLAN interfaces.
+
+Example VLAN assignment:
+
+VLAN ID	Interface	Ports / Wi-Fi
+10	eth0.10	LAN1, LAN2 (management) & SSID1
+20	eth0.20	LAN3 (guest) & SSID2
+30	eth0.30	LAN4 (IoT devices) & SSID3
+
+### Step 3: Create VLAN Interfaces
+Under Network → Interfaces, add new interfaces:
+Name them (e.g., LAN_man, LAN_guest, LAN_iot).
+Assign VLAN subinterfaces (e.g., eth0.10, eth0.20).
+Set static or DHCP IP addresses per VLAN subnet.
+
+### Step 4: Configure Firewall Zones and Rules
+Under Network → Firewall, create zones corresponding to VLAN interfaces:
+For example, lan_man, lan_guest, and lan_iot.
+Set zone forwarding and input/output policies:
+Allow lan_man full internet and inter-zone access.
+Restrict lan_guest and lan_iot from accessing lan_man.
+Typically, guests and IoT have internet access only.
+
+### Step 5: Disable DHCP Server on ISP Router if Possible (Optional)
+For simpler subnet management, disable DHCP on ISP router and use OpenWrt as primary DHCP server.
+Otherwise, accept double NAT and configure port forwards as needed.
+
+### Step 6: Test Connectivity and Segmentation
+Connect devices to respective VLAN SSIDs or LAN ports.
+Test that guests and IoT cannot reach management devices.
+Verify Internet access from all VLANs.
+
+### Useful Links:
+OpenWrt VLAN Setup Guide: https://openwrt.org/docs/guide-user/network/vlan/switch
+
+OpenWrt Firewall Zones: https://openwrt.org/docs/guide-user/firewall/firewall_configuration
+
+OpenWrt Bridge Interfaces Explanation: https://openwrt.org/docs/guide-user/network/network.bridge
