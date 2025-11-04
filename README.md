@@ -1,4 +1,4 @@
-# Secure Home Network and Home Automation System Design
+# Secure Home Network and Automation System Design
 
 ## Project Overview
 Design and implement a secure, segmented home network architecture combined with a home automation platform that includes strong security and accessibility. Leverage OpenWrt on a consumer-grade router for advanced networking features and Proxmox VE for virtualization hosting Home Assistant.
