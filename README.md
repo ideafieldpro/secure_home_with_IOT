@@ -18,6 +18,12 @@ Design and implement a secure, segmented home network architecture combined with
 
 ---
 
+## Diagram
+
+<img width="839" height="679" alt="homeNetwork20251111 drawio" src="https://github.com/user-attachments/assets/64a819c4-af6c-4717-8f0f-d72436eef27e" />
+
+---
+
 ## Considerations
 
 ### Points to check when selecting a router:
