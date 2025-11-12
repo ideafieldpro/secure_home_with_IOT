@@ -20,7 +20,7 @@ Design and implement a secure, segmented home network architecture combined with
 
 ## Diagram
 
-<img width="839" height="679" alt="homeNetwork20251111 drawio" src="https://github.com/user-attachments/assets/64a819c4-af6c-4717-8f0f-d72436eef27e" />
+<img width="839" height="679" alt="homeNetwork_20251112 drawio" src="https://github.com/user-attachments/assets/3c5de9c0-b54c-4920-bc1f-598ef0ccb1af" />
 
 ---
 
@@ -154,13 +154,13 @@ Configure the following:
 - Enable UEFI mode if supported, or leave in Legacy mode based on your hardware.
 - Enable TPM or secure boot only if required, but typically disabled for Proxmox.
 
-Save and Exit.
-
 ### Step 5: Enable Automatic Power-On
 - While in BIOS/UEFI, find settings like "Restore on AC Power Loss" or "AC Back".
 - Set it to "Power On" or "Always On" so that the device automatically powers on after power loss.
 
 Note: This setting ensures your Proxmox server will automatically start without manual intervention after power outages or restarts.
+
+Save and Exit BIOS/UEFI Settings
 
 ### Step 6: Install Proxmox VE
 - Boot from the USB drive.
@@ -172,7 +172,7 @@ Note: This setting ensures your Proxmox server will automatically start without 
 - Reboot the PC; it should now boot into Proxmox automatically.
 
 ### Step 7: Post-Installation Setup
-- Log in via the web interface at https://<your-ip>:8006.
+- Log in via the web interface at https://[your-ip]:8006.
 - Complete network configuration, storage setup, and VM deployment as needed.
 
 ### Resources:
@@ -207,13 +207,27 @@ Example VLAN assignment:
 | 20      | eth0.20   | LAN3 (guest) & SSID2            |
 | 30      | eth0.30   | LAN4 (IoT devices) & SSID3      |
 
-### Step 3: Create VLAN Interfaces
+### Step 3: Set Up Wireless Networks for Each VLAN
+- Navigate to Network → Wireless.
+- For each radio interface (2.4GHz and 5GHz), create separate Wi-Fi networks for:
+  - Management (e.g., SSID: HomeLAN) associated with VLAN 10
+  - Guest (e.g., SSID: GuestWiFi) associated with VLAN 20
+  - IoT (e.g., SSID: IoTNet) associated with VLAN 30
+    * Note: IOT devices typically only operate on 2.4GHz networks.
+
+- Configure each wireless network with:
+  - Mode: Access Point (AP)
+  - Network: Select the corresponding VLAN interface (lan_man, lan_guest, lan_iot)
+  - Security: Use WPA3 or WPA2 with a strong passphrase
+- Save, apply, and enable each wireless network configuration.
+
+### Step 4: Create VLAN Interfaces
 - Under Network → Interfaces, add new interfaces:
   - Name them (e.g., LAN_man, LAN_guest, LAN_iot).
   - Assign VLAN subinterfaces (e.g., eth0.10, eth0.20).
   - Set static or DHCP IP addresses per VLAN subnet.
 
-### Step 4: Configure Firewall Zones and Rules
+### Step 5: Configure Firewall Zones and Rules
 - Under Network → Firewall, create zones corresponding to VLAN interfaces:
   - For example, lan_man, lan_guest, and lan_iot.
 - Set zone forwarding and input/output policies:
@@ -221,11 +235,11 @@ Example VLAN assignment:
   - Restrict lan_guest and lan_iot from accessing lan_man.
   - Typically, guests and IoT have internet access only.
 
-### Step 5: Disable DHCP Server on ISP Router if Possible (Optional)
+### Step 6: Disable DHCP Server on ISP Router if Possible (Optional)
 - For simpler subnet management, disable DHCP on ISP router and use OpenWrt as primary DHCP server.
 - Otherwise, accept double NAT and configure port forwards as needed.
 
-### Step 6: Test Connectivity and Segmentation
+### Step 7: Test Connectivity and Segmentation
 - Connect devices to respective VLAN SSIDs or LAN ports.
 - Test that guests and IoT cannot reach management devices.
 - Verify Internet access from all VLANs.
