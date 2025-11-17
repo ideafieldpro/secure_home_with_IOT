@@ -16,6 +16,22 @@ Design and implement a secure, segmented home network architecture combined with
 - Segmentation reduces exposure of sensitive devices and limits attack surface
 - Implemented DHCP reservations and monitored traffic using OpenWrt tools
 
+## Table of Contents
+- [Diagram](#diagram)
+- [Considerations](#considerations)
+  - [Router Selection](#router-selection)
+  - [Proxmox Server Selection](#proxmox-server-selection)
+  - [Network Segmentation](#network-segmentation)
+- [Stage 1: Installation](#stage-1-installation)
+  - [Part 1: OpenWRT](#part-1-openwrt)
+  - [Part 2: Proxmox](#part-2-proxmox)
+- [Stage 2: Network & Server Configurations](#stage-2-network-and-server-configurations)
+  - [Part 1: OpenWRT Bridges, VLANs, & Firewall](#part-1-openwrt-bridges-vlans-and-firewall)
+  - [Part 2: Home Assistant VM](#part-2-home-assistant-vm)
+- [Stage 3: Testing and Validation](#stage-3-testing-and-validation)
+- [Stage 4: Secure Remote Management](#stage-4-optional-secure-remote-management)
+- [Conclusion and Lessons Learned](#conclusion-and-lessons-learned)
+
 ---
 
 ## Diagram
@@ -26,7 +42,7 @@ Design and implement a secure, segmented home network architecture combined with
 
 ## Considerations
 
-### Points to check when selecting a router:
+### Router Selection:
 - OpenWrt support: Official support for your model and revision (see [OpenWrt Table of Hardware](https://toh.openwrt.org/?view=normal))​
 - Flash and RAM: Minimum 16MB flash and 128MB RAM; more is better for packages, logs, and remote access.​
 - WPA3 capability: Secure modern Wi-Fi authentication.​
@@ -43,7 +59,7 @@ Design and implement a secure, segmented home network architecture combined with
   - Reliable Performance: With a 1.3GHz quad-core CPU, gigabit ports, and Wi-Fi 6, this router sustains high device counts and throughput, including for LAN and VLAN traffic requirements.​
   - Cost-effective and Compact: Delivers solid features at a lower cost than many enterprise solutions, and small size is ideal for a home setting.
 
-### Proxmox Server selection tips:
+### Proxmox Server Selection:
 - CPU Performance
    - Select a CPU with multiple cores and good single-thread performance to efficiently run Home Assistant and any lightweight supporting containers or VMs.
    - A modern Intel or AMD processor from recent generations is recommended for energy efficiency and virtualization features (e.g., VT-x/AMD-V).
@@ -181,9 +197,9 @@ Save and Exit BIOS/UEFI Settings
 
 ---
 
-# Stage 2: Network & Server Configurations
+# Stage 2: Network and Server Configurations
 
-## Part 1: OpenWRT bridges, VLANs, & firewall
+## Part 1: OpenWRT Bridges, VLANs, and Firewall
 
 When placing OpenWrt behind an ISP-provided router (in a double NAT or routed mode) for simplicity and redundancy, careful network and firewall configuration is essential to maintain segmentation and security.
 
@@ -301,7 +317,7 @@ This section explains how to configure the Home Assistant virtual machine (VM) i
  
 ---
 
-# Phase 3: Testing and Validation
+# Stage 3: Testing and Validation
 
 1. Verify IoT Device Connectivity:
    - Connect IoT devices to the IoT VLAN (VLAN 30) Wi-Fi or Ethernet ports.
@@ -324,7 +340,7 @@ This section explains how to configure the Home Assistant virtual machine (VM) i
   
 ---
 
-# Phase 4 (Optional): Secure Remote Management
+# Stage 4 (Optional): Secure Remote Management
 
 To enable secure, encrypted remote access to the home network and Home Assistant interface without exposing ports to the public internet, Tailscale was installed both on a dedicated VM inside Proxmox and on the OpenWrt router.
 
